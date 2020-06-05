@@ -1,7 +1,6 @@
-# userdefaults
+# userdefaults3
 
-Standalone Python interface to Swift's UserDefaults object on iOS terminal emulators and IDEs (LibTerm, ashell, Pyto, etc.)
-Inspired by [ObjectUserDefaults](https://github.com/ColdGrub1384/ObjectUserDefaults).
+Python 3 rewrite of userdefaults, a pure-Python interface to NSUserDefaults.
 
 The singular 'UserDefaults' class provides the main interface, which should be used
 as a regular dictionary.
