@@ -47,4 +47,4 @@ Known bugs:
 
 ## License
 
-The MIT license (see [LICENSE](./LICENSE) file)
+The MIT license (see [LICENSE](./LICENSE.txt) file)
