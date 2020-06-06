@@ -67,7 +67,6 @@ import os
 import pathlib
 import plistlib
 import sys
-import warnings
 
 __author__ = "Ong Yong Xin"
 __copyright__ = "Copyright 2020, Ong Yong Xin"
@@ -110,7 +109,13 @@ except (ImportError, NotImplementedError):
     _NSUserDefaults = None
 
 else:
+    # enable faulthandler to trace SIGBUS
+    import faulthandler
+
+    faulthandler.enable()
     _NSUserDefaults = ObjCClass("NSUserDefaults").alloc().init()
+    faulthandler.disable()
+    del faulthandler
 
 
 class UserDefaultsError(Exception):
@@ -194,9 +199,9 @@ class FileUserDefaults(BaseUserDefaults):
     def __init__(self, writeback: bool = False, suitename: str = ""):
         if suitename:
             raise NotImplementedError("suitenams not supported by FileUserDefaults")
-        
+
         del suitename
-        
+
         self._writeback = writeback
         self.path = get_userdefaults_path()
 
@@ -242,7 +247,7 @@ class ObjCUserDefaults(BaseUserDefaults):
         NotImplementedError, if an Obj-C backend is not found.
         UserDefaultsError, if self.data tries to be set (it is read-only).
     """
-    
+
     def __init__(self, writeback: bool = False, suitename: str = ""):
         del writeback
         self.suitename = suitename
@@ -278,11 +283,11 @@ class ObjCUserDefaults(BaseUserDefaults):
         raise UserDefaultsError(
             "cannot assign directly to UserDefaults: use .update() instead"
         )
-    
+
     def sync(self):
         """Dummy method for compatibility with FileUserDefaults."""
         # synchonize method depreciated - see https://developer.apple.com/documentation/foundation/nsuserdefaults/1414005-synchronize?language=objc
-        #self._userdefaults.synchronize()
+        # self._userdefaults.synchronize()
         pass
 
     def __enter__(self):
