@@ -1,5 +1,9 @@
 # userdefaults3
 
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/userdefaults3)
+![PyPI - Wheel](https://img.shields.io/pypi/wheel/userdefaults3)
+
 Python 3 rewrite of userdefaults, a pure-Python interface to NSUserDefaults.
 
 The singular 'UserDefaults' class provides the main interface, which should be used
