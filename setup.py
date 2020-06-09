@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="userdefaults3",
-    version="1.0.1",
+    version="1.1.0",
     author="Ong Yong Xin",
     author_email="ongyongxin.offical@gmail.com",
     description="Python 3 rewrite of userdefaults, a pure-Python interface to NSUserDefaults.",

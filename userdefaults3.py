@@ -23,6 +23,7 @@ shim for NSUserDefaults. Otherwise, a naive file handle is used to modify
 UserDefaults using plistlib.
 
 Supported backends:
+pyobjc (MacOS)
 rubicon-objc (Darwin/Pyto)
 objc_util (Pythonista)
 
@@ -65,6 +66,7 @@ SOFTWARE.
 from collections.abc import MutableMapping
 import os
 import pathlib
+import platform
 import plistlib
 import sys
 import warnings
@@ -73,7 +75,7 @@ __author__ = "Ong Yong Xin"
 __copyright__ = "Copyright 2020, Ong Yong Xin"
 __credits__ = ["Ong Yong Xin"]
 __license__ = "MIT"
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __maintainer__ = "Ong Yong Xin"
 __email__ = "ongyongxin2020+github@gmail.com"
 __status__ = "Production"
@@ -81,6 +83,8 @@ __status__ = "Production"
 DEFAULT_PLIST_FORMAT = plistlib.FMT_BINARY
 INFO_PLIST_PATH = pathlib.Path(sys.executable).parent / "Info.plist"
 USERHOME = pathlib.Path("~").expanduser()
+# iDevices also return Darwin, so double-check
+_ON_MAC = platform.system() == "Darwin" and "iP" not in platform.mac_ver()
 
 
 try:
@@ -101,6 +105,18 @@ try:
         # problably something to do with ctypes
         raise NotImplementedError()
 
+    elif _ON_MAC:
+        # pyobjc is the preinstalled bridge
+        import Foundation
+
+        # define shims for compatibility with rubicon-objc/objc_util
+
+        def ObjCClass(ns_object_name):
+            return getattr(Foundation, ns_object_name)
+
+        def at(object):
+            return object
+
     else:
         # default to rubicon-objc
         # TODO: add pyobjc support
@@ -113,10 +129,12 @@ else:
     # enable nicer traceback
     try:
         import faulthandler
+
         faulthandler.enable()
     except AttributeError:
+        # on Pyto, faulthandler raises this for some reason
         pass
-    _NSUserDefaults = ObjCClass("NSUserDefaults").alloc().init()
+    _NSUserDefaults = ObjCClass("NSUserDefaults").standardUserDefaults
     faulthandler.disable()
 
 
@@ -201,9 +219,9 @@ class FileUserDefaults(BaseUserDefaults):
     def __init__(self, writeback: bool = False, suitename: str = ""):
         if suitename:
             raise NotImplementedError("suitenams not supported by FileUserDefaults")
-        
+
         del suitename
-        
+
         self._writeback = writeback
         self.path = get_userdefaults_path()
 
@@ -249,7 +267,7 @@ class ObjCUserDefaults(BaseUserDefaults):
         NotImplementedError, if an Obj-C backend is not found.
         UserDefaultsError, if self.data tries to be set (it is read-only).
     """
-    
+
     def __init__(self, writeback: bool = False, suitename: str = ""):
         del writeback
         self.suitename = suitename
@@ -285,11 +303,11 @@ class ObjCUserDefaults(BaseUserDefaults):
         raise UserDefaultsError(
             "cannot assign directly to UserDefaults: use .update() instead"
         )
-    
+
     def sync(self):
         """Dummy method for compatibility with FileUserDefaults."""
         # synchonize method depreciated - see https://developer.apple.com/documentation/foundation/nsuserdefaults/1414005-synchronize?language=objc
-        #self._userdefaults.synchronize()
+        # self._userdefaults.synchronize()
         pass
 
     def __enter__(self):
