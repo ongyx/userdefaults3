@@ -34,7 +34,7 @@ __author__ = "Ong Yong Xin"
 __copyright__ = "Copyright 2020, Ong Yong Xin"
 __credits__ = ["Ong Yong Xin"]
 __license__ = "MIT"
-__version__ = "1.1.2"
+__version__ = "1.1.3"
 __maintainer__ = "Ong Yong Xin"
 __email__ = "ongyongxin2020+github@gmail.com"
 __status__ = "Production"
@@ -51,7 +51,7 @@ try:
         BUNDLE_ID = plistlib.load(f)["CFBundleIdentifier"]
 
 except (FileNotFoundError, plistlib.InvalidFileException):
-    BUNDLE_ID = None
+    BUNDLE_ID = ""
 
 
 try:
