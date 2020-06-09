@@ -34,7 +34,7 @@ __author__ = "Ong Yong Xin"
 __copyright__ = "Copyright 2020, Ong Yong Xin"
 __credits__ = ["Ong Yong Xin"]
 __license__ = "MIT"
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 __maintainer__ = "Ong Yong Xin"
 __email__ = "ongyongxin2020+github@gmail.com"
 __status__ = "Production"
@@ -64,8 +64,11 @@ try:
         # problably something to do with ctypes
         raise NotImplementedError()
 
-    elif _ON_MAC:
-        # pyobjc is the preinstalled bridge
+    elif "Pyto" in BUNDLE_ID:
+        from rubicon.objc import at, ObjCClass
+
+    else:
+        # default to pyobjc as preinstalled bridge
         import Foundation
 
         # define shims for compatibility with rubicon-objc/objc_util
@@ -75,11 +78,6 @@ try:
 
         def at(object):
             return object
-
-    else:
-        # default to rubicon-objc
-        # TODO: add pyobjc support
-        from rubicon.objc import at, ObjCClass
 
 except (ImportError, NotImplementedError):
     _NSUserDefaults = None
