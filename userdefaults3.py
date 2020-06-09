@@ -34,7 +34,7 @@ __author__ = "Ong Yong Xin"
 __copyright__ = "Copyright 2020, Ong Yong Xin"
 __credits__ = ["Ong Yong Xin"]
 __license__ = "MIT"
-__version__ = "1.1.3"
+__version__ = "1.1.4"
 __maintainer__ = "Ong Yong Xin"
 __email__ = "ongyongxin2020+github@gmail.com"
 __status__ = "Production"
@@ -79,10 +79,13 @@ try:
         def at(object):
             return object
 
+
 except (ImportError, NotImplementedError):
+    BACKEND = "file"
     _NSUserDefaults = None
 
 else:
+    BACKEND = "objc"
     # enable nicer traceback
     try:
         import faulthandler
@@ -198,15 +201,15 @@ class FileUserDefaults(BaseUserDefaults):
             UserDefaultsError, if changes were already written.
         """
 
-        if self._writeback:
-            with self.path.open(mode="wb") as f:
-                plistlib.dump(self.data, f, fmt=DEFAULT_PLIST_FORMAT)
+        with self.path.open(mode="wb") as f:
+            plistlib.dump(self.data, f, fmt=DEFAULT_PLIST_FORMAT)
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        self.sync()
+        if self._writeback:
+            self.sync()
 
 
 class ObjCUserDefaults(BaseUserDefaults):
