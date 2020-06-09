@@ -32,7 +32,8 @@ shim for NSUserDefaults. Otherwise, a naive file handle is used to modify
 UserDefaults using plistlib.
 
 Supported backends:
-- rubicon-objc (Pyto)
+- pyobjc (MacOS)
+- rubicon-objc (Darwin/Pyto)
 - objc_util (Pythonista)
 
 If your platform does not have a Obj-C backend (unless you are on Libterm/a-Shell),
