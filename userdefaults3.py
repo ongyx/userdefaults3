@@ -27,6 +27,7 @@ import os
 import pathlib
 import platform
 import plistlib
+import re
 import sys
 import warnings
 
@@ -34,24 +35,33 @@ __author__ = "Ong Yong Xin"
 __copyright__ = "Copyright 2020, Ong Yong Xin"
 __credits__ = ["Ong Yong Xin"]
 __license__ = "MIT"
-__version__ = "1.1.4"
+__version__ = "1.1.5"
 __maintainer__ = "Ong Yong Xin"
 __email__ = "ongyongxin2020+github@gmail.com"
 __status__ = "Production"
 
 DEFAULT_PLIST_FORMAT = plistlib.FMT_BINARY
-INFO_PLIST_PATH = pathlib.Path(sys.executable).parent / "Info.plist"
 USERHOME = pathlib.Path("~").expanduser()
-# iDevices also return Darwin, so double-check
-_ON_MAC = platform.system() == "Darwin" and "iP" not in platform.mac_ver()
-
+# XPC service names should follow this format
+RE_XPC_SERVICE = re.compile(r"UIKitApplication:([a-zA-Z0-9\-\.]+)\[([0-9a-fA-F]+)\]")
 
 try:
-    with open(INFO_PLIST_PATH, mode="rb") as f:
+    _INFO_PLIST = pathlib.Path(sys.executable).parent / "Info.plist"
+    with _INFO_PLIST.open(mode="rb") as f:
         BUNDLE_ID = plistlib.load(f)["CFBundleIdentifier"]
 
 except (FileNotFoundError, plistlib.InvalidFileException):
-    BUNDLE_ID = ""
+    # try harder
+    try:
+        match = RE_XPC_SERVICE.match(os.getenv("XPC_SERVICE_NAME"))
+        if match is None:
+            raise TypeError
+
+    except TypeError:
+        BUNDLE_ID = ""
+
+    else:
+        BUNDLE_ID = match.group(1)
 
 
 try:
