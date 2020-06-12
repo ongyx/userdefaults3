@@ -45,24 +45,34 @@ USERHOME = pathlib.Path("~").expanduser()
 # XPC service names should follow this format
 RE_XPC_SERVICE = re.compile(r"UIKitApplication:([a-zA-Z0-9\-\.]+)\[([0-9a-fA-F]+)\]")
 
-try:
-    _INFO_PLIST = pathlib.Path(sys.executable).parent / "Info.plist"
-    with _INFO_PLIST.open(mode="rb") as f:
-        BUNDLE_ID = plistlib.load(f)["CFBundleIdentifier"]
 
-except (FileNotFoundError, plistlib.InvalidFileException):
-    # try harder
+def get_bundle_id() -> str:
+    """Get the bundle ID of the app that userdefaults3 is running on.
+    
+    Returns:
+        The bundle ID in reverse DNS format (i.e com.example.app), otherwise an empty string ("").
+    """
+
     try:
-        match = RE_XPC_SERVICE.match(os.getenv("XPC_SERVICE_NAME"))
-        if match is None:
-            raise TypeError
+        _INFO_PLIST = pathlib.Path(sys.executable).parent / "Info.plist"
+        with _INFO_PLIST.open(mode="rb") as f:
+            return plistlib.load(f)["CFBundleIdentifier"]
 
-    except TypeError:
-        BUNDLE_ID = ""
+    except (FileNotFoundError, plistlib.InvalidFileException):
+        # try harder
+        try:
+            match = RE_XPC_SERVICE.match(os.getenv("XPC_SERVICE_NAME"))
+            if match is None:
+                raise TypeError
 
-    else:
-        BUNDLE_ID = match.group(1)
+        except TypeError:
+            return ""
 
+        else:
+            return match.group(1)
+
+
+BUNDLE_ID = get_bundle_id()
 
 try:
     if "Pythonista" in BUNDLE_ID:
