@@ -35,7 +35,7 @@ __author__ = "Ong Yong Xin"
 __copyright__ = "Copyright 2020, Ong Yong Xin"
 __credits__ = ["Ong Yong Xin"]
 __license__ = "MIT"
-__version__ = "1.1.6"
+__version__ = "1.1.7"
 __maintainer__ = "Ong Yong Xin"
 __email__ = "ongyongxin2020+github@gmail.com"
 __status__ = "Production"
@@ -44,7 +44,6 @@ DEFAULT_PLIST_FORMAT = plistlib.FMT_BINARY
 USERHOME = pathlib.Path("~").expanduser()
 # XPC service names should follow this format
 RE_XPC_SERVICE = re.compile(r"UIKitApplication:([a-zA-Z0-9\-\.]+)\[([0-9a-fA-F]+)\]")
-
 
 def get_bundle_id() -> str:
     """Get the bundle ID of the app that userdefaults3 is running on.
@@ -70,7 +69,6 @@ def get_bundle_id() -> str:
 
         else:
             return match.group(1)
-
 
 BUNDLE_ID = get_bundle_id()
 
@@ -114,7 +112,12 @@ else:
     except AttributeError:
         # on Pyto, faulthandler raises this for some reason
         pass
+    
     _NSUserDefaults = ObjCClass("NSUserDefaults").standardUserDefaults
+    # patch: On Pythonista, NSUserDefaults.standardUserDefaults has to be
+    # called to get the actual proxy :/
+    if "Pythonista" in BUNDLE_ID:
+        _NSUserDefaults = _NSUserDefaults()
     faulthandler.disable()
 
 
