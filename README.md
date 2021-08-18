@@ -50,6 +50,10 @@ a Obj-C backend (i.e Libterm, a-Shell).
 Known bugs:
 - On Pyto, writing to the inputHistory key using the Obj-C backend results in a `SIGKILL` (crashes).
 
-## License
+## Building
 
-The MIT license (see [LICENSE](./LICENSE.txt) file)
+Use flit to build/install:
+
+```bash
+$ flit build
+```

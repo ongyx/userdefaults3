@@ -1,26 +1,5 @@
 # coding: utf8
-"""Python 3 rewrite of userdefaults, a pure-Python interface to NSUserDefaults.
-
-Copyright (c) 2020 Ong Yong Xin
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-"""
+"""Python 3 rewrite of userdefaults, a pure-Python interface to NSUserDefaults."""
 
 from collections.abc import MutableMapping
 import os
@@ -32,10 +11,10 @@ import sys
 import warnings
 
 __author__ = "Ong Yong Xin"
-__copyright__ = "Copyright 2020, Ong Yong Xin"
+__copyright__ = "Copyright 2020-2021, Ong Yong Xin"
 __credits__ = ["Ong Yong Xin"]
 __license__ = "MIT"
-__version__ = "1.1.7"
+__version__ = "1.1.8"
 __maintainer__ = "Ong Yong Xin"
 __email__ = "ongyongxin2020+github@gmail.com"
 __status__ = "Production"
@@ -45,9 +24,10 @@ USERHOME = pathlib.Path("~").expanduser()
 # XPC service names should follow this format
 RE_XPC_SERVICE = re.compile(r"UIKitApplication:([a-zA-Z0-9\-\.]+)\[([0-9a-fA-F]+)\]")
 
+
 def get_bundle_id() -> str:
     """Get the bundle ID of the app that userdefaults3 is running on.
-    
+
     Returns:
         The bundle ID in reverse DNS format (i.e com.example.app), otherwise an empty string ("").
     """
@@ -69,6 +49,7 @@ def get_bundle_id() -> str:
 
         else:
             return match.group(1)
+
 
 BUNDLE_ID = get_bundle_id()
 
@@ -112,7 +93,7 @@ else:
     except AttributeError:
         # on Pyto, faulthandler raises this for some reason
         pass
-    
+
     _NSUserDefaults = ObjCClass("NSUserDefaults").standardUserDefaults
     # patch: On Pythonista, NSUserDefaults.standardUserDefaults has to be
     # called to get the actual proxy :/
@@ -147,13 +128,13 @@ def get_userdefaults_path() -> pathlib.Path:
 
 class BaseUserDefaults(MutableMapping):
     """Base class for UserDefault interfaces.
-    
+
     Interfaces which inherit from BaseUserDefaults should call
     super().__init__(data) if you override __init__().
-    
+
     Args:
         data (default: {}): The UserDefaults data, as a dictionary.
-    
+
     Attributes:
         data (dict): See above
     """
@@ -183,16 +164,16 @@ class BaseUserDefaults(MutableMapping):
 class FileUserDefaults(BaseUserDefaults):
     """Naive file-based UserDefaults context manager.
     You problably should _not_ use this, unless you are on Libterm/a-Shell.
-    
+
     Args:
         writeback: Whether or not to write back changes to UserDefaults at the end of
                    the "with" block.
                    Does not affect .sync().
-    
+
     Attributes:
         data (dict): The deserialised UserDefaults data.
         path (pathlib.Path): The path to the UserDefaults plist.
-    
+
     Raises:
         UserDefaultsError, if the plist file could not be found.
         NotImplementedError, if the platform is not supported.
@@ -219,7 +200,7 @@ class FileUserDefaults(BaseUserDefaults):
 
     def sync(self):
         """Write changes back to the UserDefaults plist file.
-        
+
         Raises:
             UserDefaultsError, if changes were already written.
         """
@@ -240,11 +221,11 @@ class ObjCUserDefaults(BaseUserDefaults):
     Args:
         writeback: Whether or not to write back changes to UserDefaults (ignored here).
         suitename: The domain ID for NSUserDefaults to access.
-    
+
     Atrributes:
         suitename (str): The suite name that NSUserDefaults was initalized with.
         objcclass (rubicon.objc.api.ObjCInstance): Raw interface to NSUserDefaults.
-    
+
     Raises:
         NotImplementedError, if an Obj-C backend is not found.
         UserDefaultsError, if self.data tries to be set (it is read-only).
