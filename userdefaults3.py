@@ -271,7 +271,7 @@ class ObjCUserDefaults(BaseUserDefaults):
         return self.objcclass.objectForKey_(key)
 
     def __setitem__(self, key, value):
-        self.objcclass.setObject_forKey_(key, at(value))
+        self.objcclass.setObject_forKey_(at(value), key)
 
     def __delitem__(self, key):
         self.objcclass.removeObjectForKey_(key)
